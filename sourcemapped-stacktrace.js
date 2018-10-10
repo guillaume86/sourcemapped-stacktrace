@@ -38,18 +38,21 @@ function(source_map_consumer) {
     var fields;
     var uri;
     var expected_fields;
-    var regex;
+    var regexes;
     var skip_lines;
 
     var fetcher = new Fetcher(opts);
 
     if (isChromeOrEdge() || isIE11Plus()) {
-      regex = /^ +at.+\((.*):([0-9]+):([0-9]+)/;
+      regexes = [
+        /^ +at.+\((.*):([0-9]+):([0-9]+)/, 
+        /^\s+at\s+(.*):([0-9]+):([0-9]+)/
+      ];
       expected_fields = 4;
       // (skip first line containing exception message)
       skip_lines = 1;
     } else if (isFirefox() || isSafari()) {
-      regex = /@(.*):([0-9]+):([0-9]+)/;
+      regexes = [/@(.*):([0-9]+):([0-9]+)/];
       expected_fields = 4;
       skip_lines = 0;
     } else {
@@ -62,7 +65,7 @@ function(source_map_consumer) {
       line = lines[i];
       if ( opts && opts.filter && !opts.filter(line) ) continue;
       
-      fields = line.match(regex);
+      fields = matchRegex(line);
       if (fields && fields.length === expected_fields) {
         rows[i] = fields;
         uri = fields[1];
@@ -265,6 +268,13 @@ function(source_map_consumer) {
           break;
       }
       return xmlhttp;
+  }
+
+  function matchRegex(line) {
+    for (var i=0; i<regexes.length; i++) {
+      var match = line.match(regexes[i]);
+      if (match) return match;
+    }
   }
 
   return {
