@@ -76,8 +76,9 @@ function(source_map_consumer) {
     }
 
     fetcher.sem.whenReady(function() {
+      var skipped = stack.split("\n").slice(0, skip_lines);
       var result = processSourceMaps(lines, rows, fetcher.mapForUri);
-      done(result);
+      done(skipped.concat(result));
     });
   };
 
