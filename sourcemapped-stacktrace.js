@@ -65,7 +65,7 @@ function(source_map_consumer) {
       line = lines[i];
       if ( opts && opts.filter && !opts.filter(line) ) continue;
       
-      fields = matchRegex(line);
+      fields = matchRegex(line, regexes);
       if (fields && fields.length === expected_fields) {
         rows[i] = fields;
         uri = fields[1];
@@ -270,7 +270,7 @@ function(source_map_consumer) {
       return xmlhttp;
   }
 
-  function matchRegex(line) {
+  function matchRegex(line, regexes) {
     for (var i=0; i<regexes.length; i++) {
       var match = line.match(regexes[i]);
       if (match) return match;
